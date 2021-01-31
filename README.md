@@ -86,7 +86,7 @@ async def send():
 
             raise
 
-asyncio.run(test())
+asyncio.run(send())
 ```
 
 
