@@ -55,6 +55,41 @@ with sync_playwright() as api:
         raise
 ```
 
+Or, if you need to perform this with `Async`, use the following snippet.
+
+```python
+from textnow_bot import AsyncTextNowBot
+from playwright import async_playwright
+import asyncio
+
+async def send():
+    username = "test@example.com"
+    password = "********"
+    recipient = "123-456-7890"
+    message = "Hello world!"
+
+    async with async_playwright() as api:
+        browser = None
+
+        try:
+            browser = await api.firefox.launch()
+            page = await browser.newPage()
+
+            bot = await AsyncTextNowBot(page, None, username, password)
+            await bot.send_message(recipient, message)
+
+            await browser.close()
+        except Exception as e:
+            if browser:
+                await browser.close()
+            print(e)
+
+            raise
+
+asyncio.run(test())
+```
+
+
 ### Login session persistence
 
 This snippet shows how to persist and restore login sessions with cookies.
