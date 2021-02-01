@@ -59,6 +59,7 @@ class AsyncMeta(type):
             await fn
         return obb
 
+
 class AsyncTextNowBot(metaclass=AsyncMeta):
     async def __init__(self, page, cookies=None, username=None, password=None):
         self.page = page
