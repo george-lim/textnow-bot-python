@@ -58,9 +58,11 @@ with sync_playwright() as api:
 Or, if you need to perform this with `Async`, use the following snippet.
 
 ```python
-from textnow_bot import AsyncTextNowBot
-from playwright import async_playwright
 import asyncio
+
+from playwright import async_playwright
+from textnow_bot import AsyncTextNowBot
+
 
 async def send():
     username = "test@example.com"
@@ -79,10 +81,9 @@ async def send():
             await bot.send_message(recipient, message)
 
             await browser.close()
-        except Exception as e:
+        except Exception:
             if browser:
                 await browser.close()
-            print(e)
 
             raise
 
