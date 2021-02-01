@@ -29,7 +29,9 @@ class TextNowBot:
             raise Exception("missing authentication info")
 
         if "/messaging" not in page.url:
-            raise Exception("authentication failed (did not reach textnow.com/messaging")
+            raise Exception(
+                "authentication failed: did not reach textnow.com/messaging"
+            )
 
     def get_cookies(self):
         return self.page.context.cookies(TEXTNOW_URL)
