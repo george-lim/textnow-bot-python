@@ -1,6 +1,5 @@
-import logging
 import inspect
-import asyncio
+import logging
 
 TEXTNOW_URL = "https://www.textnow.com"
 PERMISSION_COOKIE = {"name": "PermissionPriming", "value": "-1", "url": TEXTNOW_URL}
