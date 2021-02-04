@@ -52,7 +52,8 @@ class TextNowBot:
 
 # Code for Async Below
 
-class AsyncTextNowBot():
+
+class AsyncTextNowBot:
     def __init__(self, page, cookies=None, username=None, password=None):
         # self.log_in(page, cookies, username, password)
         print(page)
@@ -85,7 +86,9 @@ class AsyncTextNowBot():
             raise Exception("missing authentication info")
 
         if "/messaging" not in page.url:
-            raise Exception("authentication failed: did not reach textnow.com/messaging")
+            raise Exception(
+            "authentication failed: did not reach textnow.com/messaging"
+            )        
 
     async def get_cookies(self):
         return await self.page.context.cookies(TEXTNOW_URL)
