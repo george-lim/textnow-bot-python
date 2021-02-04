@@ -54,7 +54,7 @@ class TextNowBot:
 
 class AsyncTextNowBot():
     def __init__(self, page, cookies=None, username=None, password=None):
-        #self.log_in(page, cookies, username, password)
+        # self.log_in(page, cookies, username, password)
         print(page)
         self.page = page
         asyncio.ensure_future(self.log_in(cookies, username, password))
@@ -71,8 +71,8 @@ class AsyncTextNowBot():
             await page.context.clearCookies()
             # Unneccesary: await page.goto(f"{TEXTNOW_URL}/login")
 
-            # This sleep is sometimes neccessary for it to work. Sometimes it works without it. 
-            # Also, it sometimes does not work if it is a non-blocking sleep, it has to be a blocking sleep. The wonders of async.
+            # This sleep is sometimes neccessary for it to work. Sometimes it works without it.
+            # Sometimes does not work if it is a non-blocking sleep, it has to be a blocking sleep. The wonders of async.
             time.sleep(1)
             await page.type("#txt-username", username)
             await page.type("#txt-password", password)
@@ -90,7 +90,7 @@ class AsyncTextNowBot():
     async def get_cookies(self):
         return await self.page.context.cookies(TEXTNOW_URL)
 
-    async def send_message(self, recipient, message):    
+    async def send_message(self, recipient, message):
         logging.info("Async sending message...")
 
         await self.page.goto(f"{TEXTNOW_URL}/messaging")
