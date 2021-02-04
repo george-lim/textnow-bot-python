@@ -87,7 +87,7 @@ class AsyncTextNowBot:
 
         if "/messaging" not in page.url:
             raise Exception(
-            "authentication failed: did not reach textnow.com/messaging"
+                "authentication failed: did not reach textnow.com/messaging"
             )        
 
     async def get_cookies(self):
