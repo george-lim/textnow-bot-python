@@ -72,7 +72,7 @@ class AsyncTextNowBot():
             # Unneccesary: await page.goto(f"{TEXTNOW_URL}/login")
 
             # This sleep is sometimes neccessary for it to work. Sometimes it works without it.
-            # Sometimes does not work if it is a non-blocking sleep, it has to be a blocking sleep. The wonders of async.
+            # Sometimes does not work with a non-blocking sleep, it has to be a blocking sleep. The wonders of async.
             time.sleep(1)
             await page.type("#txt-username", username)
             await page.type("#txt-password", password)
