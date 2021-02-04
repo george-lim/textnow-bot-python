@@ -1,5 +1,7 @@
+import asyncio
 import inspect
 import logging
+import time
 
 TEXTNOW_URL = "https://www.textnow.com"
 PERMISSION_COOKIE = {"name": "PermissionPriming", "value": "-1", "url": TEXTNOW_URL}
@@ -51,18 +53,15 @@ class TextNowBot:
 
 # Code for Async Below
 
-class AsyncMeta(type):
-    async def __call__(cls, *args, **kwargs):
-        obb = object.__new__(cls)
-        fn = obb.__init__(*args, **kwargs)
-        if inspect.isawaitable(fn):
-            await fn
-        return obb
-
-
-class AsyncTextNowBot(metaclass=AsyncMeta):
-    async def __init__(self, page, cookies=None, username=None, password=None):
+class AsyncTextNowBot():
+    def __init__(self, page, cookies=None, username=None, password=None):
+        #self.log_in(page, cookies, username, password)
+        print(page)
         self.page = page
+        asyncio.ensure_future(self.log_in(cookies, username, password))
+
+    async def log_in(self, cookies, username, password):
+        page = self.page
 
         if cookies:
             logging.info("Async logging in with cookies...")
@@ -71,25 +70,28 @@ class AsyncTextNowBot(metaclass=AsyncMeta):
         elif username and password:
             logging.info("Async logging in with account info...")
             await page.context.clearCookies()
+            # Unneccesary: await page.goto(f"{TEXTNOW_URL}/login")
 
-            await page.goto(f"{TEXTNOW_URL}/login")
+            # This sleep is sometimes neccessary for it to work. Sometimes it works without it. 
+            # Also, it sometimes does not work if it is a non-blocking sleep, it has to be a blocking sleep. The wonders of async.
+            time.sleep(1)
             await page.type("#txt-username", username)
             await page.type("#txt-password", password)
             await page.click("#btn-login")
             await page.waitForNavigation()
 
             await page.context.addCookies([PERMISSION_COOKIE])
+            self.page = page
         else:
             raise Exception("missing authentication info")
 
         if "/messaging" not in page.url:
-            # Added more information to error message
-            raise Exception("authentication failed (did not reach textnow.com/messaging)")
+            raise Exception("authentication failed: did not reach textnow.com/messaging")
 
     async def get_cookies(self):
         return await self.page.context.cookies(TEXTNOW_URL)
 
-    async def send_message(self, recipient, message):
+    async def send_message(self, recipient, message):    
         logging.info("Async sending message...")
 
         await self.page.goto(f"{TEXTNOW_URL}/messaging")
