@@ -55,8 +55,6 @@ class TextNowBot:
 
 class AsyncTextNowBot:
     def __init__(self, page, cookies=None, username=None, password=None):
-        # self.log_in(page, cookies, username, password)
-        print(page)
         self.page = page
         asyncio.ensure_future(self.log_in(cookies, username, password))
 
