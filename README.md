@@ -134,10 +134,10 @@ asyncio.run(main())
 ### Secrets
 
 ```yaml
-PYPI_USERNAME: "__token__"
+PYPI_USERNAME: __token__
 PYPI_PASSWORD: "********"
 
-TESTPYPI_USERNAME: "__token__"
+TESTPYPI_USERNAME: __token__
 TESTPYPI_PASSWORD: "********"
 ```
 
