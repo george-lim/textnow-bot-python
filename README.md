@@ -24,7 +24,7 @@ TextNow Bot accepts either account credentials or existing login cookies to auth
 
 ## Examples
 
-### Send a message
+### Send a message (synchronously)
 
 This snippet logs into TextNow, sends a message to a recipient, and persists all login cookies to a file. It will prioritize login cookies over account credentials for authentication.
 
@@ -72,6 +72,61 @@ def run(playwright):
 
 with sync_playwright() as playwright:
     run(playwright)
+```
+
+### Send a message (asynchronously)
+
+This snippet logs into TextNow, sends a message to a recipient, and persists all login cookies to a file. It will prioritize login cookies over account credentials for authentication.
+
+```python
+import asyncio
+import json
+from pathlib import Path
+
+from playwright.async_api import async_playwright
+from textnow_bot import TextNowBot
+
+
+async def run(playwright):
+    username = "test@example.com"
+    password = "********"
+    recipient = "123-456-7890"
+    message = "Hello world!"
+
+    cookies_path = Path("/tmp/cookies.json")
+
+    browser = None
+
+    try:
+        browser = await playwright.firefox.launch()
+        page = await browser.new_page()
+
+        bot = TextNowBot(page)
+
+        if cookies_path.exists():
+            cookies = json.loads(cookies_path.read_text())
+            await bot.async_log_in(cookies)
+        else:
+            await bot.async_log_in(None, username, password)
+
+        await bot.async_send_message(recipient, message)
+
+        cookies_path.write_text(json.dumps(await bot.cookies))
+
+        await browser.close()
+    except Exception:
+        if browser:
+            await browser.close()
+
+        raise
+
+
+async def main():
+    async with async_playwright() as playwright:
+        await run(playwright)
+
+
+asyncio.run(main())
 ```
 
 ## CI/CD
