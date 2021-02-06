@@ -26,26 +26,41 @@ TextNow Bot accepts either account credentials or existing login cookies to auth
 
 ### Send a message
 
-This snippet logs into TextNow and sends a message to a recipient.
+This snippet logs into TextNow, sends a message to a recipient, and persists all login cookies to a file. It will prioritize login cookies over account credentials for authentication.
 
 ```python
-from playwright import sync_playwright
+import json
+from pathlib import Path
+
+from playwright.sync_api import sync_playwright
 from textnow_bot import TextNowBot
 
-username = "test@example.com"
-password = "********"
-recipient = "123-456-7890"
-message = "Hello world!"
 
-with sync_playwright() as api:
+def run(playwright):
+    username = "test@example.com"
+    password = "********"
+    recipient = "123-456-7890"
+    message = "Hello world!"
+
+    cookies_path = Path("/tmp/cookies.json")
+
     browser = None
 
     try:
-        browser = api.firefox.launch()
-        page = browser.newPage()
+        browser = playwright.firefox.launch()
+        page = browser.new_page()
 
-        bot = TextNowBot(page, None, username, password)
+        bot = TextNowBot(page)
+
+        if cookies_path.exists():
+            cookies = json.loads(cookies_path.read_text())
+            bot.log_in(cookies)
+        else:
+            bot.log_in(None, username, password)
+
         bot.send_message(recipient, message)
+
+        cookies_path.write_text(json.dumps(bot.cookies))
 
         browser.close()
     except Exception:
@@ -53,23 +68,10 @@ with sync_playwright() as api:
             browser.close()
 
         raise
-```
 
-### Login session persistence
 
-This snippet shows how to persist and restore login sessions with cookies.
-
-```python
-cookies_path = pathlib.Path('/tmp/cookies.json')
-
-# Persist `cookies` to `cookies_path`
-bot = TextNowBot(page, None, username, password)
-cookies = bot.get_cookies()
-cookies_path.write_text(json.dumps(cookies))
-
-# Restore `cookies` from `cookies_path`
-cookies = json.loads(cookies_path.read_text())
-bot = TextNowBot(page, cookies)
+with sync_playwright() as playwright:
+    run(playwright)
 ```
 
 ## CI/CD
@@ -77,11 +79,11 @@ bot = TextNowBot(page, cookies)
 ### Secrets
 
 ```yaml
-PYPI_USERNAME: '__token__'
-PYPI_PASSWORD: '********'
+PYPI_USERNAME: "__token__"
+PYPI_PASSWORD: "********"
 
-TESTPYPI_USERNAME: '__token__'
-TESTPYPI_PASSWORD: '********'
+TESTPYPI_USERNAME: "__token__"
+TESTPYPI_PASSWORD: "********"
 ```
 
 These secrets must exist in the repository for `CD` workflows to publish the PyPI package.
