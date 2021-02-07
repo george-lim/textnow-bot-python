@@ -24,28 +24,43 @@ TextNow Bot accepts either account credentials or existing login cookies to auth
 
 ## Examples
 
-### Send a message
+### Send a message (synchronously)
 
-This snippet logs into TextNow and sends a message to a recipient.
+This snippet logs into TextNow, sends a message to a recipient, and persists all login cookies to a file. It will prioritize login cookies over account credentials for authentication.
 
 ```python
-from playwright import sync_playwright
+import json
+from pathlib import Path
+
+from playwright.sync_api import sync_playwright
 from textnow_bot import TextNowBot
 
-username = "test@example.com"
-password = "********"
-recipient = "123-456-7890"
-message = "Hello world!"
 
-with sync_playwright() as api:
+def run(playwright):
+    username = "test@example.com"
+    password = "********"
+    recipient = "123-456-7890"
+    message = "Hello world!"
+
+    cookies_path = Path("/tmp/cookies.json")
+
     browser = None
 
     try:
-        browser = api.firefox.launch()
-        page = browser.newPage()
+        browser = playwright.firefox.launch()
+        page = browser.new_page()
 
-        bot = TextNowBot(page, None, username, password)
+        bot = TextNowBot(page)
+
+        if cookies_path.exists():
+            cookies = json.loads(cookies_path.read_text())
+            bot.log_in(cookies)
+        else:
+            bot.log_in(None, username, password)
+
         bot.send_message(recipient, message)
+
+        cookies_path.write_text(json.dumps(bot.cookies))
 
         browser.close()
     except Exception:
@@ -53,23 +68,65 @@ with sync_playwright() as api:
             browser.close()
 
         raise
+
+
+with sync_playwright() as playwright:
+    run(playwright)
 ```
 
-### Login session persistence
+### Send a message (asynchronously)
 
-This snippet shows how to persist and restore login sessions with cookies.
+This snippet logs into TextNow, sends a message to a recipient, and persists all login cookies to a file. It will prioritize login cookies over account credentials for authentication.
 
 ```python
-cookies_path = pathlib.Path('/tmp/cookies.json')
+import asyncio
+import json
+from pathlib import Path
 
-# Persist `cookies` to `cookies_path`
-bot = TextNowBot(page, None, username, password)
-cookies = bot.get_cookies()
-cookies_path.write_text(json.dumps(cookies))
+from playwright.async_api import async_playwright
+from textnow_bot import AsyncTextNowBot
 
-# Restore `cookies` from `cookies_path`
-cookies = json.loads(cookies_path.read_text())
-bot = TextNowBot(page, cookies)
+
+async def run(playwright):
+    username = "test@example.com"
+    password = "********"
+    recipient = "123-456-7890"
+    message = "Hello world!"
+
+    cookies_path = Path("/tmp/cookies.json")
+
+    browser = None
+
+    try:
+        browser = await playwright.firefox.launch()
+        page = await browser.new_page()
+
+        bot = AsyncTextNowBot(page)
+
+        if cookies_path.exists():
+            cookies = json.loads(cookies_path.read_text())
+            await bot.log_in(cookies)
+        else:
+            await bot.log_in(None, username, password)
+
+        await bot.send_message(recipient, message)
+
+        cookies_path.write_text(json.dumps(await bot.cookies))
+
+        await browser.close()
+    except Exception:
+        if browser:
+            await browser.close()
+
+        raise
+
+
+async def main():
+    async with async_playwright() as playwright:
+        await run(playwright)
+
+
+asyncio.run(main())
 ```
 
 ## CI/CD
@@ -77,11 +134,11 @@ bot = TextNowBot(page, cookies)
 ### Secrets
 
 ```yaml
-PYPI_USERNAME: '__token__'
-PYPI_PASSWORD: '********'
+PYPI_USERNAME: __token__
+PYPI_PASSWORD: "********"
 
-TESTPYPI_USERNAME: '__token__'
-TESTPYPI_PASSWORD: '********'
+TESTPYPI_USERNAME: __token__
+TESTPYPI_PASSWORD: "********"
 ```
 
 These secrets must exist in the repository for `CD` workflows to publish the PyPI package.
