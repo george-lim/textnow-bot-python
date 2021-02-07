@@ -42,7 +42,7 @@ def run(playwright):
     recipient = "123-456-7890"
     message = "Hello world!"
 
-    cookies_path = Path("/tmp/cookies.json")
+    cookies_path = Path("cookies.json")
 
     browser = None
 
@@ -93,7 +93,7 @@ async def run(playwright):
     recipient = "123-456-7890"
     message = "Hello world!"
 
-    cookies_path = Path("/tmp/cookies.json")
+    cookies_path = Path("cookies.json")
 
     browser = None
 
@@ -142,3 +142,11 @@ TESTPYPI_PASSWORD: "********"
 ```
 
 These secrets must exist in the repository for `CD` workflows to publish the PyPI package.
+
+```yaml
+SCHEDULE_TEXTNOW_USERNAME: test@example.com
+SCHEDULE_TEXTNOW_PASSWORD: "********"
+SCHEDULE_TEXTNOW_RECIPIENT: 123-456-7890
+```
+
+These secrets must exist in the repository for `Schedule` workflow to periodically send weekend text messages.
