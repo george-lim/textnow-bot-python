@@ -84,7 +84,7 @@ import json
 from pathlib import Path
 
 from playwright.async_api import async_playwright
-from textnow_bot import TextNowBot
+from textnow_bot import AsyncTextNowBot
 
 
 async def run(playwright):
@@ -101,15 +101,15 @@ async def run(playwright):
         browser = await playwright.firefox.launch()
         page = await browser.new_page()
 
-        bot = TextNowBot(page)
+        bot = AsyncTextNowBot(page)
 
         if cookies_path.exists():
             cookies = json.loads(cookies_path.read_text())
-            await bot.async_log_in(cookies)
+            await bot.log_in(cookies)
         else:
-            await bot.async_log_in(None, username, password)
+            await bot.log_in(None, username, password)
 
-        await bot.async_send_message(recipient, message)
+        await bot.send_message(recipient, message)
 
         cookies_path.write_text(json.dumps(await bot.cookies))
 

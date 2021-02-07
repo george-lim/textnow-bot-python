@@ -41,7 +41,25 @@ class TextNowBot:
 
         self._is_logged_in = True
 
-    async def async_log_in(self, cookies=None, username=None, password=None):
+    def send_message(self, recipient, message):
+        if not self.is_logged_in:
+            raise Exception("authentication failed")
+
+        logging.info("Sending message...")
+
+        self.page.goto(f"{TEXTNOW_URL}/messaging")
+        self.page.click("#newText")
+
+        self.page.type(".newConversationTextField", recipient)
+        self.page.press(".newConversationTextField", "Enter")
+
+        self.page.type("#text-input", message)
+        self.page.press("#text-input", "Enter")
+        self.page.wait_for_timeout(500)
+
+
+class AsyncTextNowBot(TextNowBot):
+    async def log_in(self, cookies=None, username=None, password=None):
         if cookies:
             logging.info("Logging in with cookies...")
             await self.page.context.add_cookies(cookies)
@@ -65,23 +83,7 @@ class TextNowBot:
 
         self._is_logged_in = True
 
-    def send_message(self, recipient, message):
-        if not self.is_logged_in:
-            raise Exception("authentication failed")
-
-        logging.info("Sending message...")
-
-        self.page.goto(f"{TEXTNOW_URL}/messaging")
-        self.page.click("#newText")
-
-        self.page.type(".newConversationTextField", recipient)
-        self.page.press(".newConversationTextField", "Enter")
-
-        self.page.type("#text-input", message)
-        self.page.press("#text-input", "Enter")
-        self.page.wait_for_timeout(500)
-
-    async def async_send_message(self, recipient, message):
+    async def send_message(self, recipient, message):
         if not self.is_logged_in:
             raise Exception("authentication failed")
 
