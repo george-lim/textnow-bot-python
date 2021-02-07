@@ -1,0 +1,33 @@
+name: Schedule
+
+on:
+  schedule:
+    - cron: "0 0 * * 6"
+  workflow_dispatch:
+
+env:
+  TARGET_NAME: textnow-bot
+  TARGET_VERSION: 1.0.0
+
+jobs:
+  schedule:
+    name: Send weekend text message
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.x
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .
+        playwright install
+    - name: Send weekend text message
+      env:
+        SCHEDULE_TEXTNOW_USERNAME: ${{ secrets.SCHEDULE_TEXTNOW_USERNAME }}
+        SCHEDULE_TEXTNOW_PASSWORD: ${{ secrets.SCHEDULE_TEXTNOW_PASSWORD }}
+        SCHEDULE_TEXTNOW_RECIPIENT: ${{ secrets.SCHEDULE_TEXTNOW_RECIPIENT }}
+      run: python scripts/send_weekend_text_message.py
