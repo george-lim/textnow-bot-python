@@ -20,13 +20,13 @@ This installs TextNow Bot and its dependencies. Once installed, add `import text
 
 ## Features
 
-TextNow Bot accepts either account credentials or existing login cookies to authenticate the user. It allows users to send messages programmatically to various recipients.
+TextNow Bot accepts either account credentials or existing login cookies to authenticate the user. It allows users to send text messages programmatically to various recipients.
 
 ## Examples
 
-### Send a message (synchronously)
+### Send text message (synchronously)
 
-This snippet logs into TextNow, sends a message to a recipient, and persists all login cookies to a file. It will prioritize login cookies over account credentials for authentication.
+This snippet logs into TextNow, sends a text message to a recipient, and persists all login cookies to a file. It will prioritize login cookies over account credentials for authentication.
 
 ```python
 import json
@@ -58,7 +58,7 @@ def run(playwright):
         else:
             bot.log_in(None, username, password)
 
-        bot.send_message(recipient, message)
+        bot.send_text_message(recipient, message)
 
         cookies_path.write_text(json.dumps(bot.cookies))
 
@@ -74,9 +74,9 @@ with sync_playwright() as playwright:
     run(playwright)
 ```
 
-### Send a message (asynchronously)
+### Send text message (asynchronously)
 
-This snippet logs into TextNow, sends a message to a recipient, and persists all login cookies to a file. It will prioritize login cookies over account credentials for authentication.
+This snippet logs into TextNow, sends a text message to a recipient, and persists all login cookies to a file. It will prioritize login cookies over account credentials for authentication.
 
 ```python
 import asyncio
@@ -109,7 +109,7 @@ async def run(playwright):
         else:
             await bot.log_in(None, username, password)
 
-        await bot.send_message(recipient, message)
+        await bot.send_text_message(recipient, message)
 
         cookies_path.write_text(json.dumps(await bot.cookies))
 

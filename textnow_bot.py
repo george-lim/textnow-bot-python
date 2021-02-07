@@ -41,11 +41,11 @@ class TextNowBot:
 
         self._is_logged_in = True
 
-    def send_message(self, recipient, message):
+    def send_text_message(self, recipient, message):
         if not self.is_logged_in:
             raise Exception("authentication failed")
 
-        logging.info("Sending message...")
+        logging.info("Sending text message...")
 
         self.page.goto(f"{TEXTNOW_URL}/messaging")
         self.page.click("#newText")
@@ -83,11 +83,11 @@ class AsyncTextNowBot(TextNowBot):
 
         self._is_logged_in = True
 
-    async def send_message(self, recipient, message):
+    async def send_text_message(self, recipient, message):
         if not self.is_logged_in:
             raise Exception("authentication failed")
 
-        logging.info("Sending message...")
+        logging.info("Sending text message...")
 
         await self.page.goto(f"{TEXTNOW_URL}/messaging")
         await self.page.click("#newText")
